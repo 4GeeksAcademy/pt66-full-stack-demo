@@ -35,5 +35,5 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // This can be used to network with other containers or the host.
   "forwardPorts": [3000, 3001, 5432],
-  "onCreateCommand": "npm ci; (cp .env.example .env || echo \".env creation failed\"); (pipenv install || echo \"Python enviromnent creation failed\"); pipenv run setup;"
+  "onCreateCommand": "npm ci; (cp .env.example .env || echo \".env creation failed\"); (pipenv install || echo \"Python enviromnent creation failed\"); (pipenv run setup|| echo \"Migrations already setup.\");"
 }
