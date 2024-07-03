@@ -11,11 +11,64 @@ api = Blueprint('api', __name__, url_prefix="/api")
 CORS(api)
 
 
-@api.route('/hello', methods=['POST', 'GET'])
-def handle_hello():
-
-    response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+@api.route("/users", methods=["POST"])
+def create_user():
+    """
+    body:
+    {
+        "username": "sombra",
+        "password": "littleblueparrot"
     }
+    """
+    body = request.json
 
-    return jsonify(response_body), 200
+    # select * from `users` where username="sombra" limit 1;
+    user: User | None = User.query.filter_by(
+        username=body["username"]
+    ).first()
+    if user:
+        return jsonify(message="User already exists"), 400
+    
+    user = User(
+        username=body["username"],
+        password=body["password"]
+    )
+    db.session.add(user)
+    db.session.commit()
+    db.session.refresh(user)
+
+    return jsonify(user.serialize())
+
+
+# @api.route("/users", methods=["GET"])
+# def read_users():
+#     photo_users = []
+#     for user in users:
+#         photo_users.append({
+#             **user,
+#             "photos": list(filter(
+#                 lambda photo: photo["user_id"] == user["id"],
+#                 photos
+#             ))
+#         })
+#     return jsonify(users=photo_users)
+
+
+# @api.route("/photos", methods=["POST"])
+# def create_photo():
+#     """
+#     Body:
+#     {
+#         "url": "https://wob.site/photo.jpg",
+#         "user_id": 1
+#     }
+#     """
+#     data = request.json
+#     if data["user_id"] not in [u["id"] for u in users]:
+#         return jsonify(msg="User does not exist."), 404
+#     photo = {
+#         **data,
+#         "id": len(photos) + 1
+#     }
+#     photos.append(photo)
+#     return jsonify(photo)
