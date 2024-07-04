@@ -46,6 +46,11 @@ class User(db.Model):
     #     back_populates="user",
     #     uselist=True
     # )
+    collections = db.relationship(
+        "backend.models.Collection",
+        back_populates="user",
+        uselist=True
+    )
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
@@ -100,4 +105,21 @@ class Comment(db.Model):
     #     uselist=False
     # )
     text = db.Column(db.String(512))
+
+
+class Collection(db.Model):
+    __tablename__ = "collections"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256), nullable=False)
+    description = db.Column(db.Text)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id')
+    )
+    user = db.relationship(
+        "backend.models.User",
+        back_populates="collections",
+        uselist=False
+    )
+
 
