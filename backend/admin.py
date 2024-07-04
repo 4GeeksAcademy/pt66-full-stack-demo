@@ -3,6 +3,7 @@ from flask_admin import Admin
 from backend.models import db, User, Photo
 from flask_admin.contrib.sqla import ModelView
 
+
 class UserView(ModelView):
     column_list = [
         'id', 'username', 'photos'
