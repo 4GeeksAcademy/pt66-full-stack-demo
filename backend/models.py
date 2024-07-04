@@ -36,16 +36,19 @@ class User(db.Model):
     )
     password = db.Column(db.String(128), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    # photos = db.relationship(
-    #     "Photos",
-    #     back_populates="user",
-    #     uselist=True
-    # )
+    photos = db.relationship(
+        "backend.models.Photo",
+        back_populates="user",
+        uselist=True
+    )
     # comments = db.relationship(
     #     "Comment",
     #     back_populates="user",
     #     uselist=True
     # )
+
+    def __repr__(self) -> str:
+        return f"<User {self.username}>"
 
     def serialize(self):
         return {
@@ -62,11 +65,11 @@ class Photo(db.Model):
         db.Integer,
         db.ForeignKey('users.id')
     )
-    # user = db.relationship(
-    #     "User",
-    #     back_populates="photos",
-    #     uselist=False
-    # )
+    user = db.relationship(
+        "backend.models.User",
+        back_populates="photos",
+        uselist=False
+    )
     # comments = db.relationship(
     #     "Comment",
     #     back_populates="photo",
