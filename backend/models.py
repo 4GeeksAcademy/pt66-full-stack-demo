@@ -55,12 +55,15 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f"<User {self.username}>"
 
-    def serialize(self):
-        return {
+    def serialize(self, include_photos=False):
+        data = {
             "id": self.id,
             "username": self.username,
             "is_active": self.is_active,
         }
+        if include_photos:
+            data["photos"] = [photo.serialize() for photo in self.photos]
+        return data
 
 
 class Photo(db.Model):
@@ -81,6 +84,18 @@ class Photo(db.Model):
     #     uselist=True
     # )
     url = db.Column(db.String(128))
+
+    def __repr__(self) -> str:
+        return f"<Photo {self.id}>"
+
+    def serialize(self, include_user=False):
+        data = {
+            "id": self.id,
+            "url": self.url,
+        }
+        if include_user:
+            data["user"] = self.user.serialize()
+        return data
 
 
 class Comment(db.Model):

@@ -28,3 +28,4 @@ dist-ssr
 migrations/versions/*.py
 /public/assets/*
 # !.vscode/launch.json
+__pycache__
