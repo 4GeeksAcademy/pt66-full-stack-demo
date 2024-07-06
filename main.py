@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 from backend.admin import setup_admin
+from backend.commands import setup_commands
 from backend.models import db
 from backend.routes import api
 
@@ -31,6 +32,7 @@ migrate = Migrate(app, db)
 cors = CORS(app)
 
 setup_admin(app)
+setup_commands(app)
 
 app.register_blueprint(api)
 
