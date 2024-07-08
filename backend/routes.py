@@ -4,11 +4,39 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from backend.models import db, User, Photo
 from flask_cors import CORS
+from flask_jwt_extended import (
+    create_access_token, current_user, jwt_required
+)
 
 api = Blueprint('api', __name__, url_prefix="/api")
 
 # Allow CORS requests to this API
 CORS(api)
+
+
+@api.route("/login", methods=["POST"])
+def login():
+    """
+    body:
+    {
+        "username": "sombra",
+        "password": "littleblueparrot"
+    }
+    """
+    body = request.json
+    user: User | None = User.query.filter_by(
+        username=body["username"]
+    ).first()
+
+    if not user:
+        return jsonify(msg="Invalid credentials."), 401
+    
+    if user.password != body.get("password"):
+        return jsonify(msg="Invalid credentials."), 401
+
+    return jsonify(
+        token=create_access_token(user)
+    )
 
 
 @api.route("/users", methods=["POST"])
@@ -27,7 +55,7 @@ def create_user():
         username=body["username"]
     ).first()
     if user:
-        return jsonify(message="User already exists"), 400
+        return jsonify(msg="User already exists"), 400
     
     user = User(
         username=body["username"],
@@ -38,6 +66,12 @@ def create_user():
     db.session.refresh(user)
 
     return jsonify(user.serialize())
+
+
+@api.route("/users/current", methods=["GET"])
+@jwt_required()
+def read_current_user():
+    return jsonify(current_user.serialize(include_photos=True))
 
 
 @api.route("/users", methods=["GET"])
@@ -55,16 +89,16 @@ def read_single_user(username):
 
 
 @api.route("/photos", methods=["POST"])
+@jwt_required()
 def create_photo():
     """
     Body:
     {
         "url": "https://wob.site/photo.jpg",
-        "user_id": 1
     }
     """
     data = request.json
-    user = User.query.filter_by(id=data.get("user_id")).first()
+    user = current_user
 
     if not user:
         return jsonify(msg="User does not exist."), 404
