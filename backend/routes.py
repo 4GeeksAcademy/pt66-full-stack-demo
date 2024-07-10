@@ -31,7 +31,7 @@ def login():
     if not user:
         return jsonify(msg="Invalid credentials."), 401
     
-    if user.password != body.get("password"):
+    if not user.check_password(body.get("password")):
         return jsonify(msg="Invalid credentials."), 401
 
     return jsonify(

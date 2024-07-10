@@ -2,12 +2,16 @@ import os
 from flask_admin import Admin
 from backend.models import db, User, Photo
 from flask_admin.contrib.sqla import ModelView
+from wtforms.fields import PasswordField
 
 
 class UserView(ModelView):
     column_list = [
-        'id', 'username', 'photos'
+        'id', 'username', 'photos', 'password'
     ]
+    form_extra_fields = {
+        'password': PasswordField('password')
+    }
 
 
 def setup_admin(app):

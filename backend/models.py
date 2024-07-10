@@ -1,4 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.security import (
+    generate_password_hash, check_password_hash
+)
 
 db = SQLAlchemy()
 
@@ -34,7 +38,7 @@ class User(db.Model):
         unique=True,
         nullable=False
     )
-    password = db.Column(db.String(128), nullable=False)
+    _password = db.Column(db.String(256), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     photos = db.relationship(
         "backend.models.Photo",
@@ -51,6 +55,17 @@ class User(db.Model):
         back_populates="user",
         uselist=True
     )
+
+    @hybrid_property
+    def password(self):
+        return self._password
+    
+    @password.setter
+    def password(self, password):
+        self._password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self._password, password)
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
