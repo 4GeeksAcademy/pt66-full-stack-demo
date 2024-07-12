@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import request, jsonify, Blueprint
 from backend.models import db, User, Photo
 from flask_cors import CORS
 from flask_jwt_extended import (
@@ -123,7 +123,6 @@ def read_single_photo(id: int):
     if not photo:
         return jsonify(msg="Photo does not exist."), 404
     return jsonify(photo.serialize(include_user=True))
-    
 
 
 @api.route("/photos/<int:id>", methods=["PUT"])
